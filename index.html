@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/5/tinymce.min.js" referrerpolicy="origin"></script>
+  <script src="https://cdn.tiny.cloud/1/zp1on9m5ugdkirnglhwxto16kkovw36cjz6igx4gddq0nlr1/tinymce/5/tinymce.min.js">
+  </script>
+  <script>tinymce.init(
+          {
+            selector:'textarea',
+            plugins: "image",
+            images_upload_handler: function (blobInfo, success, failure) {
+              console.log("oi");
+              var xhr, formData;
+
+              xhr = new XMLHttpRequest();
+              xhr.withCredentials = false;
+              xhr.open('POST', 'image.php');
+
+              xhr.onload = function() {
+                var json;
+
+                if (xhr.status != 200) {
+                  failure('HTTP Error: ' + xhr.status);
+                  return;
+                }
+
+                json = JSON.parse(xhr.responseText);
+
+                if (!json || typeof json.location != 'string') {
+                  failure('Invalid JSON: ' + xhr.responseText);
+                  return;
+                }
+
+                success(json.location);
+              };
+
+              formData = new FormData();
+              formData.append('file', blobInfo.blob(), blobInfo.filename());
+              console.log(formData);
+              xhr.send(formData);
+            }
+          });
+  </script>
+</head>
+<body>
+  <h2>Teste TinyMCE</h2>
+  <textarea>
+
+  </textarea>
+</body>
+</html>
